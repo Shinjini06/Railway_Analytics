@@ -1,13 +1,3 @@
-"""
-RAILWAY DATA ENGINEERING PROJECT - FIXED VERSION
-==================================================
-A comprehensive data analysis and engineering solution for railway operational data.
-Suitable for 3rd year CSE students - covers all 4 levels of the task.
-
-Author: Data Engineering Task Solution
-Date: 2026
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,20 +13,17 @@ plt.rcParams['figure.figsize'] = (12, 6)
 plt.rcParams['font.size'] = 10
 
 class DataExploration:
-    """Level 1: Load, inspect, and understand the dataset."""
     
     def __init__(self, filepath):
-        """Initialize and load the dataset."""
         print("\n" + "="*70)
         print("LEVEL 1: DATA EXPLORATION AND BASIC OPERATIONS")
         print("="*70)
         
         self.df = pd.read_csv(filepath)
-        print(f"✓ Dataset loaded successfully!")
+        print(f"\n✓ Dataset loaded successfully!")
         print(f"✓ Dataset shape: {self.df.shape} (rows, columns)")
         
     def task_1_1_inspect_data(self):
-        """Task 1.1: Load and inspect data - First 10 rows and structure."""
         print("\n--- TASK 1.1: Data Inspection ---")
         
         print("\nFirst 10 rows:")
@@ -58,7 +45,6 @@ class DataExploration:
             print(missing)
             
     def task_1_2_basic_statistics(self):
-        """Task 1.2: Calculate basic statistics."""
         print("\n--- TASK 1.2: Basic Statistics ---")
         
         num_trains = self.df['Train_No'].nunique()
@@ -74,7 +60,6 @@ class DataExploration:
         for idx, (station, count) in enumerate(source_counts.items(), 1):
             print(f"  {idx}. {station}: {count} trains")
         
-        # Most common destination stations
         print("\nTop 10 Most Common Destination Stations:")
         dest_counts = self.df['Destination_Station_Name'].value_counts().head(10)
         for idx, (station, count) in enumerate(dest_counts.items(), 1):
@@ -86,7 +71,6 @@ class DataExploration:
             print(f"  {day}: {count} trains")
     
     def task_1_3_data_cleaning(self):
-        """Task 1.3: Data cleaning - Handle missing values and standardize."""
         print("\n--- TASK 1.3: Data Cleaning ---")
         
         print("\nChecking for missing values...")
@@ -113,17 +97,14 @@ class DataExploration:
         return self.df
 
 class DataTransformation:
-    """Level 2: Filtering, grouping, aggregation, and enrichment."""
     
     def __init__(self, df):
-        """Initialize with cleaned dataframe."""
         print("\n" + "="*70)
         print("LEVEL 2: DATA TRANSFORMATION AND AGGREGATION")
         print("="*70)
         self.df = df.copy()
         
     def task_2_1_filtering(self):
-        """Task 2.1: Filter data for specific conditions."""
         print("\n--- TASK 2.1: Data Filtering ---")
         
         print("\nTrains operating on SATURDAY:")
@@ -142,16 +123,13 @@ class DataTransformation:
         return saturday_trains, station_trains
     
     def task_2_2_grouping_aggregation(self):
-        """Task 2.2: Grouping and aggregation operations."""
         print("\n--- TASK 2.2: Grouping and Aggregation ---")
         
-        # Group by source station and count trains
         print("\nTrains originating from each source station:")
         source_agg = self.df.groupby('Source_Station_Name').size().reset_index(name='Train_Count')
         source_agg = source_agg.sort_values('Train_Count', ascending=False)
         print(source_agg.head(15).to_string())
         
-        # Average trains per day for each source station
         print("\n\nTrain count by day of week:")
         day_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
         day_agg = self.df.groupby('days').size().reset_index(name='Train_Count')
@@ -162,23 +140,19 @@ class DataTransformation:
         return source_agg, day_agg
     
     def task_2_3_enrichment(self):
-        """Task 2.3: Add derived columns for categorization."""
         print("\n--- TASK 2.3: Data Enrichment ---")
         
-        # Categorize by weekday/weekend
         weekend_days = {'SATURDAY', 'SUNDAY'}
         self.df['Day_Category'] = self.df['days'].apply(
             lambda x: 'WEEKEND' if x in weekend_days else 'WEEKDAY'
         )
         
-        # Count trains by category
         print("\nTrain distribution by day category:")
         category_dist = self.df['Day_Category'].value_counts()
         for cat, count in category_dist.items():
             percentage = (count / len(self.df)) * 100
             print(f"  {cat}: {count} trains ({percentage:.2f}%)")
         
-        # Add journey length category
         self.df['Is_Local'] = (self.df['Source_Station_Name'] == 
                                self.df['Destination_Station_Name']).astype(int)
         
@@ -192,20 +166,16 @@ class DataTransformation:
         return self.df
 
 class AdvancedAnalysis:
-    """Level 3: Pattern analysis and insights."""
     
     def __init__(self, df):
-        """Initialize with enriched dataframe."""
         print("\n" + "="*70)
         print("LEVEL 3: ADVANCED DATA ANALYSIS")
         print("="*70)
         self.df = df.copy()
         
     def task_3_1_pattern_analysis(self):
-        """Task 3.1: Analyze distribution and patterns."""
         print("\n--- TASK 3.1: Pattern Analysis ---")
         
-        # Distribution of trains by day of week
         print("\nTrain distribution throughout the week:")
         day_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
         day_dist = self.df['days'].value_counts().reindex(day_order)
@@ -214,15 +184,13 @@ class AdvancedAnalysis:
             bar_length = int(count / 100)
             print(f"  {day:12}: {count:5} trains |" + "█" * bar_length)
         
-        # Top source-destination pairs
         print("\n\nTop 15 Source-Destination Pairs:")
         route_pairs = self.df.groupby(['Source_Station_Name', 'Destination_Station_Name']).size()\
                              .reset_index(name='Count').sort_values('Count', ascending=False)
         print(route_pairs.head(15).to_string())
         
-        # Routes by day of week
         print("\n\nMost popular routes by day of week:")
-        for day in day_order[:3]:  # Show first 3 days as sample
+        for day in day_order[:3]:
             day_routes = self.df[self.df['days'] == day]\
                         .groupby(['Source_Station_Name', 'Destination_Station_Name']).size()\
                         .reset_index(name='Count').sort_values('Count', ascending=False).head(3)
@@ -231,32 +199,27 @@ class AdvancedAnalysis:
                 print(f"    {row['Source_Station_Name']} → {row['Destination_Station_Name']}: {row['Count']} trains")
     
     def task_3_2_correlation_insights(self):
-        """Task 3.2: Explore correlations and provide insights."""
         print("\n--- TASK 3.2: Correlation and Insights ---")
         
         print("\nKey Insights:")
         
-        # Peak day analysis
         train_per_day = self.df['days'].value_counts()
         peak_day = train_per_day.idxmax()
         peak_count = train_per_day.max()
         print(f"\n1. Peak Operating Day:")
         print(f"   {peak_day} has the maximum trains: {peak_count}")
         
-        # Weekend vs Weekday
         weekend_trains = self.df[self.df['Day_Category'] == 'WEEKEND'].shape[0]
         weekday_trains = self.df[self.df['Day_Category'] == 'WEEKDAY'].shape[0]
         print(f"\n2. Weekday vs Weekend Analysis:")
         print(f"   Weekday trains: {weekday_trains} ({weekday_trains/len(self.df)*100:.2f}%)")
         print(f"   Weekend trains: {weekend_trains} ({weekend_trains/len(self.df)*100:.2f}%)")
         
-        # Station connectivity
         top_source = self.df['Source_Station_Name'].value_counts().index[0]
         top_source_count = self.df['Source_Station_Name'].value_counts().iloc[0]
         print(f"\n3. Most Connected Source Station:")
         print(f"   {top_source} with {top_source_count} trains")
         
-        # Journey type analysis
         local_trains = self.df['Is_Local'].sum()
         print(f"\n4. Journey Type Distribution:")
         print(f"   Local trains: {local_trains} ({local_trains/len(self.df)*100:.2f}%)")
@@ -265,10 +228,8 @@ class AdvancedAnalysis:
         return train_per_day
 
 class Visualization:
-    """Level 4: Create visualizations and generate report."""
     
     def __init__(self, df):
-        """Initialize with dataframe."""
         print("\n" + "="*70)
         print("LEVEL 4: DATA VISUALIZATION AND REPORTING")
         print("="*70)
@@ -276,10 +237,8 @@ class Visualization:
         self.figures = []
         
     def task_4_1_visualizations(self):
-        """Task 4.1: Create comprehensive visualizations."""
         print("\n--- TASK 4.1: Creating Visualizations ---")
         
-        # Figure 1: Trains by Day of Week
         fig, ax = plt.subplots(figsize=(12, 6))
         day_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
         day_counts = self.df['days'].value_counts().reindex(day_order)
@@ -291,7 +250,6 @@ class Visualization:
         ax.set_ylabel('Number of Trains', fontsize=12)
         ax.grid(axis='y', alpha=0.3)
         
-        # Add value labels on bars
         for bar in bars:
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
@@ -303,7 +261,6 @@ class Visualization:
         print("✓ Saved: viz_1_trains_by_day.png")
         plt.close()
         
-        # Figure 2: Top 15 Source Stations
         fig, ax = plt.subplots(figsize=(12, 8))
         top_sources = self.df['Source_Station_Name'].value_counts().head(15)
         ax.barh(range(len(top_sources)), top_sources.values, color='#2ecc71', alpha=0.8, edgecolor='black')
@@ -314,7 +271,6 @@ class Visualization:
         ax.invert_yaxis()
         ax.grid(axis='x', alpha=0.3)
         
-        # Add value labels
         for i, v in enumerate(top_sources.values):
             ax.text(v + 2, i, str(v), va='center', fontweight='bold')
         
@@ -323,7 +279,6 @@ class Visualization:
         print("✓ Saved: viz_2_top_source_stations.png")
         plt.close()
         
-        # Figure 3: Top 15 Destination Stations
         fig, ax = plt.subplots(figsize=(12, 8))
         top_dests = self.df['Destination_Station_Name'].value_counts().head(15)
         ax.barh(range(len(top_dests)), top_dests.values, color='#9b59b6', alpha=0.8, edgecolor='black')
@@ -334,7 +289,6 @@ class Visualization:
         ax.invert_yaxis()
         ax.grid(axis='x', alpha=0.3)
         
-        # Add value labels
         for i, v in enumerate(top_dests.values):
             ax.text(v + 2, i, str(v), va='center', fontweight='bold')
         
@@ -343,7 +297,6 @@ class Visualization:
         print("✓ Saved: viz_3_top_destination_stations.png")
         plt.close()
         
-        # Figure 4: Weekday vs Weekend Distribution
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         
         category_counts = self.df['Day_Category'].value_counts()
@@ -352,7 +305,6 @@ class Visualization:
                colors=colors_pie, startangle=90, textprops={'fontsize': 12, 'fontweight': 'bold'})
         ax1.set_title('Weekday vs Weekend Distribution', fontsize=14, fontweight='bold')
         
-        # Bar chart comparison
         ax2.bar(category_counts.index, category_counts.values, color=colors_pie, alpha=0.8, edgecolor='black')
         ax2.set_ylabel('Number of Trains', fontsize=12)
         ax2.set_title('Weekday vs Weekend Count', fontsize=14, fontweight='bold')
@@ -366,7 +318,6 @@ class Visualization:
         print("✓ Saved: viz_4_weekday_weekend.png")
         plt.close()
         
-        # Figure 5: Local vs Inter-city Trains
         fig, ax = plt.subplots(figsize=(10, 6))
         journey_counts = self.df['Is_Local'].value_counts()
         journey_labels = ['Inter-city Trains', 'Local Trains']
@@ -382,7 +333,6 @@ class Visualization:
         print("✓ Saved: viz_5_train_types.png")
         plt.close()
         
-        # Figure 6: Heatmap of Source-Destination Top Pairs
         fig, ax = plt.subplots(figsize=(14, 10))
         
         top_sources_list = self.df['Source_Station_Name'].value_counts().head(10).index
@@ -407,7 +357,6 @@ class Visualization:
         plt.close()
     
     def task_4_2_generate_report(self):
-        """Task 4.2: Generate comprehensive report."""
         print("\n--- TASK 4.2: Generating Comprehensive Report ---")
         
         report = """
@@ -436,7 +385,6 @@ DATASET OVERVIEW
         report += "KEY STATISTICS\n"
         report += "─"*80 + "\n\n"
         
-        # Day-wise distribution
         day_order = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
         report += "1. Train Distribution by Day of Week:\n"
         for day in day_order:
@@ -536,7 +484,6 @@ planning, resource allocation, and strategic decision-making.
 Report Generated: Railway Data Engineering Project Analysis
 """
         
-        # Save report to file
         with open('RAILWAY_ANALYSIS_REPORT.txt', 'w', encoding='utf-8') as f:
              f.write(report)
         
@@ -547,7 +494,6 @@ Report Generated: Railway Data Engineering Project Analysis
 
 
 def main():
-    """Execute the complete data engineering pipeline."""
     
     print("\n" + "╔" + "═"*78 + "╗")
     print("║" + " "*78 + "║")
@@ -556,29 +502,24 @@ def main():
     print("║" + " "*78 + "║")
     print("╚" + "═"*78 + "╝")
     
-    # LEVEL 1: Data Exploration
     explorer = DataExploration(CSV_FILE)
     explorer.task_1_1_inspect_data()
     explorer.task_1_2_basic_statistics()
     df_cleaned = explorer.task_1_3_data_cleaning()
     
-    # LEVEL 2: Data Transformation
     transformer = DataTransformation(df_cleaned)
     saturday_trains, station_trains = transformer.task_2_1_filtering()
     source_agg, day_agg = transformer.task_2_2_grouping_aggregation()
     df_enriched = transformer.task_2_3_enrichment()
     
-    # LEVEL 3: Advanced Analysis
     analyzer = AdvancedAnalysis(df_enriched)
     analyzer.task_3_1_pattern_analysis()
     analyzer.task_3_2_correlation_insights()
     
-    # LEVEL 4: Visualization and Reporting
     visualizer = Visualization(df_enriched)
     visualizer.task_4_1_visualizations()
     visualizer.task_4_2_generate_report()
     
-    # Summary
     print("\n" + "="*80)
     print("EXECUTION COMPLETED SUCCESSFULLY! ✓".center(80))
     print("="*80)
